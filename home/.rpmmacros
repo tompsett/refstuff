@@ -1,1 +1,3 @@
 
+%_topdir   %(echo $HOME)/myrpms
+%_tmppath  %{_topdir}/tmp
