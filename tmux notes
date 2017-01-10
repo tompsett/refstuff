@@ -1,0 +1,13 @@
+# Move the panes around
+:select-layout even-vertical
+:select-layout even-horizontal
+:select-layout tiled
+
+
+# Sync/unsync the windows
+:setw synchronize-panes
+
+$ tmux ls
+
+$ tmux new -s <name>
+$ tmux A -t <name>
