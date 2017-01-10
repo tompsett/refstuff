@@ -1,3 +1,48 @@
 
 mkdir -p ~/myrpms/{RPMS,SRPMS,BUILD,SOURCES,SPECS,tmp}
 
+
+
+%define        __spec_install_post %{nil}
+%define          debug_package %{nil}
+%define        __os_install_post %{_dbpath}/brp-compress
+
+Summary: Simple binary package
+Name: tombin
+Version: 1.0
+Release: 1
+License: Apache
+Group: Utilities/Tools
+SOURCE0 : %{name}-%{version}.tar.gz
+URL: http://github.com/tompsett
+
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
+
+%description
+%{summary}
+
+%prep
+%setup -q
+
+%build
+# Binary only no build required.
+
+%install
+#Clear broot and create clean
+rm -rf %{buildroot}
+mkdir -p  %{buildroot}
+
+# in builddir
+cp -a * %{buildroot}
+
+%clean
+rm -rf %{buildroot}
+
+%files
+%defattr(-,root,root,-)
+%config(noreplace) %{_sysconfdir}/%{name}/%{name}.conf
+%{_bindir}/*
+
+%changelog
+* Tuen Jan 10 2017  TBC TBC <tbc@rpm5.org> 1.0-1
+- Initial Build
