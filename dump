@@ -1,0 +1,2 @@
+ # using eyaml for encrypt data
+ eyaml.ruby2.1 edit --pkcs7-public-key <keyfile.pem> --pkcs7-private-key <privkey.pem> <file to edit>
