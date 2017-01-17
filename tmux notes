@@ -12,4 +12,4 @@ Useful: https://gist.github.com/MohamedAlaa/2961058
 $ tmux ls
 
 $ tmux new -s <name>
-$ tmux A -t <name>
+$ tmux a -t <name>
