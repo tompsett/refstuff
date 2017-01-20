@@ -1,0 +1,11 @@
+key stuff
+
+
+# Convert ".jks" file to ".p12" (PKCS12):
+keytool -importkeystore -srckeystore keystore.jks -destkeystore keystore.p12 -deststoretype PKCS12
+# List
+keytool -deststoretype PKCS12 -keystore keystore.p12 -list
+# Extract pem from ".p12" file:
+openssl pkcs12 -nokeys -in keystore.p12 -out certfile.pem
+# Extract unencrypted key file from ".p12" keysotre file:
+openssl pkcs12 -nocerts -nodes -in keystore.p12 -out keyfile.key
