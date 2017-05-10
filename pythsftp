@@ -1,0 +1,111 @@
+import paramiko as ssh
+import argparse
+from getpass import getuser, getpass
+import sys
+import os.path
+import errno
+import md5
+
+parser = argparse.ArgumentParser()
+parser.add_argument('host')
+args = parser.parse_args()
+
+print(args.host)
+
+class SFTPWrapper():
+    def __init__(self,hostname,user,**kwargs):
+        self.hostname=hostname
+        self.username=user
+        if not self.username:
+            self.username = getuser()
+
+        timeout = kwargs.get('timeout', None)
+        compress = kwargs.get('compress', False)
+        port = kwargs.get('port', 22)
+
+        client = ssh.SSHClient()
+        client.load_system_host_keys()
+        client.set_missing_host_key_policy(ssh.AutoAddPolicy())
+
+        try:
+            client.connect(self.hostname,
+                           username=self.username,
+                           password='pwd',
+                           port=port,
+                           timeout=timeout,
+                           compress=compress)
+        except:
+            print('Failed to open SSH Connection')
+            sys.exit(1)
+
+        self.sftp = client.open_sftp()
+
+    def path_exists(self, remote_path):
+        """
+        Check to see if a path exsits on the remote server
+        """
+        try:
+            self.sftp.chdir(remote_path)
+        except IOError:
+            return False
+
+        return True
+
+    def file_exists(self, remote_path):
+        """
+        Check to see if a path exsits on the remote server
+        """
+        try:
+            self.sftp.stat(remote_path)
+        except IOError as error:
+            if error.errno == errno.ENOENT:
+                return False
+            else:
+                raise error
+
+        return True
+
+    def upload(self, local_file, remote_path):
+        """
+        Upload a file to the remote server
+        """
+        try:
+            self.sftp.put(local_file, remote_path)
+        except IOError:
+            return False
+        return True
+
+
+    def download(self, remote_path, local_file):
+        """
+        Download a file from the remote server
+        """
+        try:
+            self.sftp.get(remote_path, local_file)
+        except IOError:
+            return False
+        return True
+
+    def check_file(self, remote_file, local_file):
+        #if remote file exists
+        try:
+            if self.sftp.stat(remote_file):
+                local_file_data = open(local_file, "rb").read()
+                remote_file_data = self.sftp.open(remote_file).read()
+                md1 = md5.new(local_file_data).digest()
+                md2 = md5.new(remote_file_data).digest()
+                if md1 == md2:
+                    is_up_to_date = True
+                    print("UNCHANGED: %s") % os.path.basename(local_file)
+                else:
+                    print("MODIFIED: %s") % os.path.basename(local_file)
+        except:
+            print("NEW: %s") % os.path.basename(local_file),
+
+
+boo = SFTPWrapper(hostname='laskjdf',user='root')
+boo.upload('one.d','ione')
+print(boo.file_exists('ionde'))
+if boo.file_exists('ionde'):
+    boo.download('one','one.d')
+print(boo.check_file('one','one.d'))
